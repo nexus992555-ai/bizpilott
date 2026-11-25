@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Онлайн-запись</title>
+  <meta name="description" content="Запишитесь онлайн в удобное время">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <meta name="theme-color" content="#6366f1">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-soft: #eef2ff;
+      --radius: 12px;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+           background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .booking-page { max-width: 520px; margin: 0 auto; padding: 24px 16px 80px; }
+
+    /* Header */
+    .biz-header { text-align: center; margin-bottom: 32px; }
+    .biz-logo { width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 12px;
+                background: var(--accent); display: flex; align-items: center;
+                justify-content: center; overflow: hidden; }
+    .biz-logo img { width: 100%; height: 100%; }
+    .biz-name { font-size: 22px; font-weight: 700; }
+    .biz-niche { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+    /* Steps */
+    .steps { display: flex; gap: 0; margin-bottom: 28px; border-radius: var(--radius);
+             background: var(--card); border: 1px solid var(--border); overflow: hidden; }
+    .step { flex: 1; padding: 10px 8px; text-align: center; font-size: 12px; font-weight: 600;
+            color: var(--muted); border-right: 1px solid var(--border); position: relative;
+            cursor: default; transition: background .15s, color .15s; }
+    .step:last-child { border-right: none; }
+    .step.active { background: var(--accent-soft); color: var(--accent); }
+    .step.done { background: #f0fdf4; color: #16a34a; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center;
+                width: 20px; height: 20px; border-radius: 50%; font-size: 11px;
+                font-weight: 700; margin-right: 4px; background: currentColor; }
+    .step.active .step-num { background: var(--accent); color: white; }
+    .step.done .step-num { background: #16a34a; color: white; }
+    .step:not(.active):not(.done) .step-num { background: var(--border); color: var(--muted); }
+
+    /* Card */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
+    .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+
+    /* Service grid */
+    .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .service-card { border: 2px solid var(--border); border-radius: 10px; padding: 14px;
+                    cursor: pointer; transition: all .15s; }
+    .service-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .service-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .service-name { font-weight: 600; font-size: 14px; }
+    .service-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .service-price { font-size: 15px; font-weight: 700; color: var(--accent); margin-top: 6px; }
+
+    /* Staff */
+    .staff-list { display: flex; flex-direction: column; gap: 8px; }
+    .staff-card { display: flex; align-items: center; gap: 12px; border: 2px solid var(--border);
+                  border-radius: 10px; padding: 12px; cursor: pointer; transition: all .15s; }
+    .staff-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .staff-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .staff-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft);
+                    color: var(--accent); font-weight: 700; display: flex; align-items: center;
+                    justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .staff-info .staff-name { font-weight: 600; font-size: 14px; }
+    .staff-info .staff-role { font-size: 12px; color: var(--muted); }
+    .staff-any { border-style: dashed; }
+
+    /* Date grid */
+    .date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+    .date-cell { aspect-ratio: 1; border: 2px solid var(--border); border-radius: 8px; cursor: pointer;
+                 display: flex; flex-direction: column; align-items: center; justify-content: center;
+                 font-size: 11px; transition: all .15s; }
+    .date-cell:hover:not(.disabled) { border-color: var(--accent); background: var(--accent-soft); }
+    .date-cell.selected { border-color: var(--accent); background: var(--accent); color: white; }
+    .date-cell.disabled { opacity: .4; cursor: not-allowed; }
+    .date-cell .dn { font-size: 10px; color: inherit; opacity: .7; }
+    .date-cell .dd { font-weight: 700; font-size: 14px; }
+
+    /* Time slots */
+    .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .time-btn { border: 2px solid var(--border); border-radius: 8px; padding: 8px 4px;
+                font-size: 13px; font-weight: 500; cursor: pointer; background: white;
+                transition: all .15s; text-align: center; }
+    .time-btn:hover:not(.taken) { border-color: var(--accent); background: var(--accent-soft); }
+    .time-btn.selected { border-color: var(--accent); background: var(--accent); color: white; }
+    .time-btn.taken { background: var(--bg); color: var(--muted); cursor: not-allowed;
+                      text-decoration: line-through; opacity: .5; }
+
+    /* Form */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+    .form-group input, .form-group textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px;
+      font-size: 14px; font-family: inherit; transition: border-color .15s; outline: none; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+
+    /* Summary */
+    .summary-row { display: flex; justify-content: space-between; padding: 10px 0;
+                   border-bottom: 1px solid var(--border); font-size: 14px; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .label { color: var(--muted); }
+    .summary-row .value { font-weight: 500; }
+    .summary-price { font-size: 20px; font-weight: 700; color: var(--accent); }
+
+    /* Actions */
+    .btn-primary { width: 100%; padding: 14px; background: var(--accent); color: white;
+                   border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+                   cursor: pointer; transition: background .15s; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-back { background: none; border: none; color: var(--accent); font-size: 14px;
+                cursor: pointer; padding: 4px 0; font-weight: 500; display: flex;
+                align-items: center; gap: 4px; margin-bottom: 16px; }
+    .btn-back:hover { opacity: .7; }
+
+    /* Success screen */
+    .success-screen { text-align: center; padding: 32px 0; }
+    .success-icon { width: 72px; height: 72px; background: #dcfce7; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+                    font-size: 36px; }
+    .success-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .success-sub { color: var(--muted); font-size: 15px; }
+    .success-detail { background: var(--accent-soft); border-radius: 10px; padding: 16px;
+                      margin: 20px 0; text-align: left; font-size: 14px; }
+    .success-detail div { padding: 4px 0; }
+
+    /* Loading / error */
+    .loader { text-align: center; padding: 48px; color: var(--muted); }
+    .error-msg { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+                 padding: 16px; color: #dc2626; font-size: 14px; margin-bottom: 16px; }
+    .powered { text-align: center; margin-top: 32px; font-size: 12px; color: var(--muted); }
+    .powered a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 400px) {
+      .service-grid { grid-template-columns: 1fr; }
+      .time-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="booking-page">
+  <div class="biz-header">
+    <div class="biz-logo" id="biz-logo">
+      <img src="/logo.svg" alt="Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="biz-name" id="biz-name">Загрузка...</div>
+    <div class="biz-niche" id="biz-niche"></div>
+  </div>
+
+  <div id="steps-bar" class="steps" style="display:none">
+    <div class="step active" data-step="1">
+      <span class="step-num">1</span>Услуга
+    </div>
+    <div class="step" data-step="2">
+      <span class="step-num">2</span>Мастер
+    </div>
+    <div class="step" data-step="3">
+      <span class="step-num">3</span>Дата и время
+    </div>
+    <div class="step" data-step="4">
+      <span class="step-num">4</span>Контакты
+    </div>
+  </div>
+
+  <div id="booking-content">
+    <div class="loader">⟳ Загрузка...</div>
+  </div>
+
+  <div class="powered">
+    Работает на <a href="/" target="_blank">BizPilot</a>
+  </div>
+</div>
+
+<script>
+(function() {
+  const slug = location.pathname.replace('/book/', '').replace(/\//g, '');
+  const API = '';
+
+  let bizData = null;
+  let state = { step: 1, service: null, staff: null, date: null, time: null };
+
+  const DAY_NAMES = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const MONTH_NAMES = ['января','февраля','марта','апреля','мая','июня',
+                       'июля','августа','сентября','октября','ноября','декабря'];
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function loadBusiness() {
+    try {
+      const r = await fetch(`${API}/api/book/${slug}`);
+      if (!r.ok) throw new Error(r.status === 404 ? 'Бизнес не найден' : 'Ошибка загрузки');
+      bizData = await r.json();
+      applyBranding();
+      renderStep(1);
+    } catch (e) {
+      document.getElementById('booking-content').innerHTML =
+        `<div class="error-msg">⚠ ${esc(e.message)}<br><small>Проверьте ссылку или свяжитесь с администратором.</small></div>`;
+    }
+  }
+
+  function applyBranding() {
+    document.title = `Запись в ${bizData.name}`;
+    document.getElementById('biz-name').textContent = bizData.name;
+    document.getElementById('biz-niche').textContent = bizData.niche_label || '';
+    if (bizData.accent) {
+      document.documentElement.style.setProperty('--accent', bizData.accent);
+      document.documentElement.style.setProperty('--accent-soft', bizData.accent + '18');
+    }
+    document.getElementById('steps-bar').style.display = 'flex';
+  }
+
+  function updateStepsBar(current) {
+    document.querySelectorAll('.step').forEach(el => {
+      const n = +el.dataset.step;
+      el.className = 'step' + (n === current ? ' active' : n < current ? ' done' : '');
+    });
+  }
+
+  function renderStep(n) {
+    state.step = n;
+    updateStepsBar(n);
+    const content = document.getElementById('booking-content');
+    if (n === 1) content.innerHTML = renderServices();
+    else if (n === 2) content.innerHTML = renderStaff();
+    else if (n === 3) content.innerHTML = renderDatetime();
+    else if (n === 4) content.innerHTML = renderContactForm();
+    attachStepHandlers(n);
+  }
+
+  /* Step 1 — Services */
+  function renderServices() {
+    const svcs = bizData.services || [];
+    if (!svcs.length) return `<div class="card"><p class="card-title">Нет доступных услуг</p><p style="color:var(--muted);font-size:14px">Администратор ещё не добавил услуги.</p></div>`;
+    return `<div class="card">
+      <div class="card-title">Выберите услугу</div>
+      <div class="service-grid">
+        ${svcs.map(s => `
+          <div class="service-card${state.service?.id === s.id ? ' selected' : ''}" data-svc="${esc(s.id)}">
+            <div class="service-name">${esc(s.name)}</div>
+            <div class="service-meta">${s.duration ? s.duration + ' мин' : ''}</div>
+            <div class="service-price">${s.price ? s.price.toLocaleString('ru') + ' ₽' : 'Цена по запросу'}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <button class="btn-primary" id="step1-next" ${state.service ? '' : 'disabled'}>Далее →</button>`;
+  }
+
+  /* Step 2 — Staff */
+  function renderStaff() {
+    const staff = (bizData.staff || []).filter(s => s.active !== false);
+    return `<button class="btn-back" id="back-1">← Назад</button>
+    <div class="card">
+      <div class="card-title">Выберите мастера</div>
+      <div class="staff-list">
+        <div class="staff-card staff-any${!state.staff ? ' selected' : ''}" data-sid="any">
+          <div class="staff-avatar">?</div>
+          <div class="staff-info">
+            <div class="staff-name">Любой свободный</div>
+            <div class="staff-role">Автоматический выбор</div>
+          </div>
+        </div>
+        ${staff.map(s => {
+          const initials = s.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+          return `<div class="staff-card${state.staff?.id === s.id ? ' selected' : ''}" data-sid="${esc(s.id)}">
+            <div class="staff-avatar">${initials}</div>
+            <div class="staff-info">
+              <div class="staff-name">${esc(s.name)}</div>
+              <div class="staff-role">${esc(s.role || '')}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <button class="btn-primary" id="step2-next">Далее →</button>`;
+  }
+
+  /* Step 3 — Date & Time */
+  function renderDatetime() {
+    const today = new Date();
+    const dates = [];
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dates.push(d);
+    }
+    const takenSlots = bizData.booked_slots || {};
+    const selDate = state.date ? state.date.toDateString() : null;
+
+    const timeSlots = generateTimeSlots(state.date, takenSlots);
+
+    return `<button class="btn-back" id="back-2">← Назад</button>
+    <div class="card">
+      <div class="card-title">Выберите дату</div>
+      <div class="date-grid">
+        ${dates.map(d => {
+          const isSelected = d.toDateString() === selDate;
+          const isPast = d < new Date(today.setHours(0,0,0,0));
+          return `<div class="date-cell${isSelected ? ' selected' : ''}${isPast ? ' disabled' : ''}" data-date="${d.toISOString()}">
+            <span class="dn">${DAY_NAMES[d.getDay()]}</span>
+            <span class="dd">${d.getDate()}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    ${state.date ? `
+    <div class="card">
+      <div class="card-title">Выберите время <small style="color:var(--muted);font-weight:400">${state.date.getDate()} ${MONTH_NAMES[state.date.getMonth()]}</small></div>
+      <div class="time-grid">
+        ${timeSlots.map(t => `
+          <button class="time-btn${t.taken ? ' taken' : ''}${state.time === t.time ? ' selected' : ''}"
+                  data-time="${t.time}" ${t.taken ? 'disabled' : ''}>${t.time}</button>
+        `).join('')}
+      </div>
+    </div>` : '<div class="card"><p style="color:var(--muted);font-size:14px;">← Выберите дату выше</p></div>'}
+    <button class="btn-primary" id="step3-next" ${state.date && state.time ? '' : 'disabled'}>Далее →</button>`;
+  }
+
+  function generateTimeSlots(date, takenSlots) {
+    const slots = [];
+    const dateKey = date ? date.toISOString().split('T')[0] : null;
+    const taken = dateKey ? (takenSlots[dateKey] || []) : [];
+    for (let h = 9; h < 21; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const time = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        slots.push({ time, taken: taken.includes(time) });
+      }
+    }
+    return slots;
+  }
+
+  /* Step 4 — Contact form */
+  function renderContactForm() {
+    const svc = state.service;
+    const dateStr = state.date
+      ? `${state.date.getDate()} ${MONTH_NAMES[state.date.getMonth()]}, ${state.time}`
+      : '';
+    return `<button class="btn-back" id="back-3">← Назад</button>
+    <div class="card">
+      <div class="card-title">Итог записи</div>
+      <div class="summary-row"><span class="label">Услуга</span><span class="value">${esc(svc?.name||'')}</span></div>
+      <div class="summary-row"><span class="label">Мастер</span><span class="value">${state.staff ? esc(state.staff.name) : 'Любой свободный'}</span></div>
+      <div class="summary-row"><span class="label">Дата</span><span class="value">${dateStr}</span></div>
+      <div class="summary-row"><span class="label">Стоимость</span><span class="value summary-price">${svc?.price ? svc.price.toLocaleString('ru') + ' ₽' : 'По договорённости'}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ваши данные</div>
+      <div id="form-err" class="error-msg" style="display:none"></div>
+      <div class="form-group">
+        <label>Имя *</label>
+        <input type="text" id="f-name" placeholder="Иван Иванов" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Телефон *</label>
+        <input type="tel" id="f-phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label>Email (необязательно)</label>
+        <input type="email" id="f-email" placeholder="ivan@mail.ru" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Комментарий</label>
+        <textarea id="f-note" placeholder="Особые пожелания..."></textarea>
+      </div>
+    </div>
+    <button class="btn-primary" id="step4-submit">Записаться</button>`;
+  }
+
+  function attachStepHandlers(n) {
+    if (n === 1) {
+      document.querySelectorAll('.service-card').forEach(el => {
+        el.addEventListener('click', () => {
+          const svcId = el.dataset.svc;
+          state.service = (bizData.services || []).find(s => String(s.id) === svcId);
+          renderStep(1);
+        });
+      });
+      document.getElementById('step1-next')?.addEventListener('click', () => {
+        if (state.service) renderStep(2);
+      });
+    }
+    if (n === 2) {
+      document.getElementById('back-1')?.addEventListener('click', () => renderStep(1));
+      document.querySelectorAll('.staff-card').forEach(el => {
+        el.addEventListener('click', () => {
+          const sid = el.dataset.sid;
+          state.staff = sid === 'any' ? null : (bizData.staff||[]).find(s=>String(s.id)===sid);
+          renderStep(2);
+        });
+      });
+      document.getElementById('step2-next')?.addEventListener('click', () => renderStep(3));
+    }
+    if (n === 3) {
+      document.getElementById('back-2')?.addEventListener('click', () => renderStep(2));
+      document.querySelectorAll('.date-cell:not(.disabled)').forEach(el => {
+        el.addEventListener('click', () => {
+          state.date = new Date(el.dataset.date);
+          state.time = null;
+          renderStep(3);
+        });
+      });
+      document.querySelectorAll('.time-btn:not(.taken)').forEach(el => {
+        el.addEventListener('click', () => {
+          state.time = el.dataset.time;
+          renderStep(3);
+        });
+      });
+      document.getElementById('step3-next')?.addEventListener('click', () => {
+        if (state.date && state.time) renderStep(4);
+      });
+    }
+    if (n === 4) {
+      document.getElementById('back-3')?.addEventListener('click', () => renderStep(3));
+      document.getElementById('step4-submit')?.addEventListener('click', submitBooking);
+    }
+  }
+
+  async function submitBooking() {
+    const name = document.getElementById('f-name')?.value.trim();
+    const phone = document.getElementById('f-phone')?.value.trim();
+    const email = document.getElementById('f-email')?.value.trim();
+    const note = document.getElementById('f-note')?.value.trim();
+    const errEl = document.getElementById('form-err');
+
+    if (!name) { errEl.textContent = 'Введите имя'; errEl.style.display='block'; return; }
+    if (!phone) { errEl.textContent = 'Введите номер телефона'; errEl.style.display='block'; return; }
+    errEl.style.display = 'none';
+
+    const btn = document.getElementById('step4-submit');
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+
+    try {
+      const payload = {
+        slug,
+        service_id: state.service?.id,
+        staff_id: state.staff?.id || null,
+        date: state.date?.toISOString().split('T')[0],
+        time: state.time,
+        client: { name, phone, email, note }
+      };
+      const r = await fetch(`${API}/api/book`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Ошибка при записи');
+
+      showSuccess(data);
+    } catch (e) {
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Записаться';
+    }
+  }
+
+  function showSuccess(data) {
+    document.getElementById('steps-bar').style.display = 'none';
+    const dateStr = state.date
+      ? `${state.date.getDate()} ${MONTH_NAMES[state.date.getMonth()]} в ${state.time}`
+      : '';
+    document.getElementById('booking-content').innerHTML = `
+      <div class="success-screen">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Вы записаны!</div>
+        <div class="success-sub">Ждём вас в ${esc(bizData.name)}</div>
+        <div class="success-detail">
+          <div>📋 <strong>${esc(state.service?.name||'')}</strong></div>
+          ${state.staff ? `<div>👤 ${esc(state.staff.name)}</div>` : ''}
+          <div>📅 ${dateStr}</div>
+          ${bizData.address ? `<div>📍 ${esc(bizData.address)}</div>` : ''}
+          ${bizData.phone ? `<div>📞 <a href="tel:${esc(bizData.phone)}">${esc(bizData.phone)}</a></div>` : ''}
+        </div>
+        <p style="color:var(--muted);font-size:14px;">Мы напомним вам о записи за день.</p>
+      </div>`;
+  }
+
+  // Load business data on page load
+  if (slug) {
+    loadBusiness();
+  } else {
+    document.getElementById('booking-content').innerHTML =
+      '<div class="error-msg">⚠ Неверная ссылка. Получите ссылку для записи у администратора.</div>';
+  }
+})();
+</script>
+</body>
+</html>

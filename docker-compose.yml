@@ -1,0 +1,19 @@
+services:
+  bizpilot:
+    build: .
+    container_name: bizpilot
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=8123
+      - BIZPILOT_ENV=production
+      - DATA_DIR=/app/data
+      # Раскомментируйте для отправки писем восстановления пароля:
+      # - SMTP_HOST=
+      # - SMTP_PORT=587
+      # - SMTP_USER=
+      # - SMTP_PASS=
+      # - SMTP_FROM=noreply@bizpilot.kz

@@ -1,0 +1,13 @@
+# Local database & secrets
+bizpilot.db
+*.db
+.bizpilot_secret
+data/
+
+# Windows local binaries & temp
+*.exe
+*.vbs
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

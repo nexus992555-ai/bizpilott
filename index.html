@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizPilot — Платформа управления бизнесом</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BizPilot">
+  <meta name="description" content="Управление записями, клиентами и аналитикой для малого бизнеса">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="onboarding.css?v=5">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar" aria-label="Основная навигация">
+      <div class="sidebar-header">
+        <div class="brand-row">
+          <div class="brand-logo" aria-hidden="true">
+            <img src="logo.svg" alt="BizPilot" width="20" height="20" style="display:block; border-radius:4px;">
+          </div>
+          <div class="brand-meta">
+            <span class="brand-name">BizPilot</span>
+            <span class="brand-plan">PRO OS</span>
+          </div>
+        </div>
+        <button id="sidebar-collapse-btn" class="icon-btn subtle" title="Свернуть меню" aria-label="Свернуть меню"></button>
+      </div>
+
+      <!-- Niche & Business Switcher -->
+      <div class="niche-switcher-wrap">
+        <button id="niche-switcher-btn" class="niche-switcher-btn" type="button" aria-haspopup="true" aria-expanded="false">
+          <div class="niche-switcher-icon" id="current-niche-icon"></div>
+          <div class="niche-switcher-info">
+            <span class="niche-business-name" id="current-business-name">Blade &amp; Crown</span>
+            <span class="niche-type-label" id="current-niche-label">Барбершоп</span>
+          </div>
+          <span class="niche-chevron" id="niche-chevron-icon"></span>
+        </button>
+        <div id="niche-dropdown" class="niche-dropdown hidden" role="menu">
+          <div class="niche-dropdown-header">Переключить нишу бизнеса</div>
+          <div id="niche-dropdown-list" class="niche-dropdown-list"></div>
+        </div>
+      </div>
+
+      <!-- Primary Navigation -->
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="shift-status-card" id="shift-status-card">
+          <div class="shift-dot"></div>
+          <div class="shift-text">
+            <div class="shift-title">Смена активна</div>
+            <div class="shift-sub" id="shift-hours">09:00 — 21:00</div>
+          </div>
+        </div>
+        <div class="user-profile-mini">
+          <div class="avatar sm" id="owner-avatar">АК</div>
+          <div class="user-profile-info">
+            <div class="user-name" id="owner-name">Алексей К.</div>
+            <div class="user-role">Управляющий</div>
+          </div>
+          <button id="theme-toggle-btn" class="icon-btn subtle" title="Переключить тему" aria-label="Переключить тему"></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-area">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="icon-btn subtle mobile-only" aria-label="Открыть меню"></button>
+          <div class="breadcrumb">
+            <span class="breadcrumb-niche" id="topbar-niche-pill"></span>
+            <h1 class="page-title" id="page-title">Главная панель</h1>
+          </div>
+        </div>
+
+        <div class="topbar-center">
+          <button id="command-palette-trigger" class="search-trigger" type="button">
+            <span class="search-icon-slot" id="topbar-search-icon"></span>
+            <span class="search-placeholder">Поиск клиентов, записей, услуг...</span>
+            <kbd class="kbd-hint">Ctrl K</kbd>
+          </button>
+        </div>
+
+        <div class="topbar-right">
+          <div class="topbar-date" id="topbar-date"></div>
+          <button id="auth-btn" class="btn btn-secondary btn-sm" type="button">Войти</button>
+          <button id="notifications-btn" class="icon-btn subtle has-badge" title="Уведомления" aria-label="Уведомления">
+            <span id="notifications-icon-slot"></span>
+            <span class="badge-dot" id="notif-badge"></span>
+          </button>
+          <button id="quick-create-btn" class="btn btn-primary" type="button">
+            <span class="btn-icon-slot" id="quick-create-icon"></span>
+            <span id="quick-create-label">Новая запись</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Demo Mode Banner -->
+      <div id="demo-banner" class="demo-banner hidden" role="status">
+        <div class="demo-banner-left">
+          <span class="demo-banner-pill">Демо-режим</span>
+          <span class="demo-banner-text">Вы просматриваете платформу с тестовыми данными. Можно переключать ниши и тестировать все функции.</span>
+        </div>
+        <button id="clear-demo-btn" class="btn btn-sm demo-banner-btn" type="button">Убрать демо-данные и начать с нуля</button>
+      </div>
+
+      <!-- Dynamic View Container -->
+      <main id="view-container" class="view-container" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- Slide-over Drawer (Client 360 / Booking Details / Notifications) -->
+  <div id="drawer-backdrop" class="backdrop hidden"></div>
+  <aside id="app-drawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <span class="drawer-eyebrow" id="drawer-eyebrow"></span>
+        <h2 class="drawer-title" id="drawer-title">Детали</h2>
+      </div>
+      <button id="drawer-close-btn" class="icon-btn subtle" aria-label="Закрыть панель"></button>
+    </div>
+    <div id="drawer-body" class="drawer-body"></div>
+  </aside>
+
+  <!-- Modal Dialog (Create Booking / Client / Service / Staff) -->
+  <div id="modal-backdrop" class="backdrop hidden"></div>
+  <div id="app-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Создать</h2>
+      <button id="modal-close-btn" class="icon-btn subtle" aria-label="Закрыть окно"></button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+
+  <!-- Command Palette -->
+  <div id="cmdk-backdrop" class="backdrop hidden"></div>
+  <div id="cmdk-modal" class="cmdk-modal hidden" role="dialog" aria-modal="true" aria-label="Быстрый поиск">
+    <div class="cmdk-input-row">
+      <span id="cmdk-search-icon" class="cmdk-icon"></span>
+      <input id="cmdk-input" type="text" placeholder="Найти клиента, запись, услугу или перейти в раздел..." autocomplete="off">
+      <kbd class="kbd-hint">ESC</kbd>
+    </div>
+    <div id="cmdk-results" class="cmdk-results"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobile-backdrop" class="backdrop hidden"></div>
+
+  <!-- Onboarding Overlay -->
+  <div id="onboarding-overlay" class="onboarding-overlay hidden" role="dialog" aria-modal="true" aria-label="Настройка BizPilot"></div>
+
+  <script defer src="js/icons.js?v=8"></script>
+  <script defer src="js/niches.js?v=8"></script>
+  <script defer src="js/store.js?v=8"></script>
+  <script defer src="js/charts.js?v=8"></script>
+  <script defer src="js/views.js?v=8"></script>
+  <script defer src="js/onboarding.js?v=8"></script>
+  <script defer src="js/app.js?v=8"></script>
+</body>
+</html>

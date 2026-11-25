@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Main gradient: deep indigo → violet -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </linearGradient>
+
+    <!-- Accent gradient: indigo → violet–blue -->
+    <linearGradient id="glyph" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#c4b5fd"/>
+    </linearGradient>
+
+    <!-- Shine overlay -->
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Soft glow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Drop shadow for card depth -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#1e1b4b" flood-opacity="0.55"/>
+    </filter>
+
+    <clipPath id="card-clip">
+      <rect width="512" height="512" rx="110" ry="110"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base card -->
+  <rect width="512" height="512" rx="110" ry="110" fill="url(#bg)" filter="url(#shadow)"/>
+
+  <!-- Inner background texture dots (subtle) -->
+  <g clip-path="url(#card-clip)" opacity="0.07">
+    <circle cx="80"  cy="80"  r="90" fill="#818cf8"/>
+    <circle cx="440" cy="440" r="110" fill="#7c3aed"/>
+    <circle cx="420" cy="90"  r="65" fill="#6366f1"/>
+  </g>
+
+  <!-- Shine overlay top -->
+  <rect width="512" height="512" rx="110" ry="110" fill="url(#shine)"/>
+
+  <!-- === GLYPH: Layered cube / stack icon (representing "platform") === -->
+  <!-- Bottom rhombus layer -->
+  <polygon
+    points="256,330 370,268 256,206 142,268"
+    fill="none"
+    stroke="url(#glyph)" stroke-width="14"
+    stroke-linejoin="round"
+    opacity="0.45"
+  />
+
+  <!-- Middle layer: left face -->
+  <polygon
+    points="142,268 142,210 256,272 256,330"
+    fill="#6366f1"
+    opacity="0.60"
+  />
+
+  <!-- Middle layer: right face -->
+  <polygon
+    points="370,268 370,210 256,272 256,330"
+    fill="#818cf8"
+    opacity="0.45"
+  />
+
+  <!-- Top rhombus (main bright layer) -->
+  <polygon
+    points="256,218 356,165 256,112 156,165"
+    fill="none"
+    stroke="url(#glyph)" stroke-width="14"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+
+  <!-- Top left face -->
+  <polygon
+    points="156,165 156,218 256,271 256,218"
+    fill="#818cf8"
+    opacity="0.80"
+  />
+
+  <!-- Top right face -->
+  <polygon
+    points="356,165 356,218 256,271 256,218"
+    fill="#c4b5fd"
+    opacity="0.70"
+  />
+
+  <!-- Top face fill (bright) -->
+  <polygon
+    points="256,112 356,165 256,218 156,165"
+    fill="url(#glyph)"
+    opacity="0.95"
+  />
+
+  <!-- Rising "signal" bars inside top face — business analytics metaphor -->
+  <g transform="translate(206,152)" opacity="0.55">
+    <rect x="0"  y="20" width="10" height="10" rx="2" fill="#1e1b4b"/>
+    <rect x="15" y="12" width="10" height="18" rx="2" fill="#1e1b4b"/>
+    <rect x="30" y="4"  width="10" height="26" rx="2" fill="#1e1b4b"/>
+    <rect x="45" y="10" width="10" height="20" rx="2" fill="#1e1b4b"/>
+    <rect x="60" y="2"  width="10" height="28" rx="2" fill="#1e1b4b"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="256" y="410"
+    text-anchor="middle"
+    font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+    font-size="72"
+    font-weight="800"
+    letter-spacing="-2"
+    fill="#e0e7ff"
+  >BizPilot</text>
+
+  <!-- Tagline -->
+  <text
+    x="256" y="455"
+    text-anchor="middle"
+    font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+    font-size="26"
+    font-weight="500"
+    letter-spacing="4"
+    fill="#818cf8"
+    opacity="0.80"
+  >BUSINESS OS</text>
+</svg>

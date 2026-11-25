@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: bizpilot
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "8123"
+      - key: BIZPILOT_ENV
+        value: "production"
+      - key: DATA_DIR
+        value: "/app"
