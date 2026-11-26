@@ -697,28 +697,40 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 self.end_headers()
                 self.wfile.write(login_html.encode("utf-8"))
                 return
+            import html as html_mod
             with get_db() as conn:
                 total_users = conn.execute("SELECT COUNT(*) as n FROM users").fetchone()["n"]
                 recent_users = conn.execute(
-                    "SELECT u.email, u.created_at, w.active_niche, w.name as ws_name FROM users u LEFT JOIN workspaces w ON w.user_id = u.id ORDER BY u.created_at DESC LIMIT 50"
+                    """SELECT u.email, u.created_at, w.active_niche,
+                              COALESCE(NULLIF(np.business_name, ''), NULLIF(w.owner_name, ''), u.name) as ws_name
+                       FROM users u
+                       LEFT JOIN workspaces w ON w.user_id = u.id
+                       LEFT JOIN niche_profiles np ON np.workspace_id = w.id AND np.niche_id = w.active_niche
+                       ORDER BY u.created_at DESC LIMIT 50"""
                 ).fetchall()
                 total_workspaces = conn.execute("SELECT COUNT(*) as n FROM workspaces").fetchone()["n"]
                 total_bookings = conn.execute("SELECT COUNT(*) as n FROM bookings").fetchone()["n"]
                 total_clients = conn.execute("SELECT COUNT(*) as n FROM clients").fetchone()["n"]
-                plan_requests = conn.execute("SELECT email, name, phone, plan, created_at FROM plan_requests ORDER BY created_at DESC LIMIT 20").fetchall()
+                plan_requests = conn.execute(
+                    """SELECT pr.contact, pr.comment, pr.plan_id, pr.created_at, u.email as user_email
+                       FROM plan_requests pr
+                       LEFT JOIN users u ON u.id = pr.user_id
+                       ORDER BY pr.created_at DESC LIMIT 20"""
+                ).fetchall()
             def ts(t):
                 if not t: return "—"
                 try: return datetime.fromtimestamp(int(t)).strftime("%d.%m.%Y %H:%M")
                 except: return str(t)
+            esc = html_mod.escape
             rows_html = ""
             for u in recent_users:
                 niche_map = {"barbershop": "💈 Барбершоп", "salon": "💅 Салон", "fitness": "🏋️ Фитнес",
                              "clinic": "🏥 Клиника", "restaurant": "🍽️ Ресторан", "retail": "🛍️ Магазин"}
-                niche = niche_map.get(u["active_niche"], u["active_niche"] or "—")
-                rows_html += f"<tr><td>{u['email']}</td><td>{u['ws_name'] or '—'}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
+                niche = niche_map.get(u["active_niche"], esc(u["active_niche"] or "—"))
+                rows_html += f"<tr><td>{esc(u['email'])}</td><td>{esc(u['ws_name'] or '—')}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
             plans_html = ""
             for p in plan_requests:
-                plans_html += f"<tr><td>{p['email']}</td><td>{p['name'] or '—'}</td><td>{p['phone'] or '—'}</td><td>{p['plan']}</td><td>{ts(p['created_at'])}</td></tr>"
+                plans_html += f"<tr><td>{esc(p['user_email'] or '—')}</td><td>{esc(p['contact'] or '—')}</td><td>{esc(p['comment'] or '—')}</td><td>{esc(p['plan_id'] or '—')}</td><td>{ts(p['created_at'])}</td></tr>"
             html = f"""<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -736,7 +748,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
 <table><thead><tr><th>Email</th><th>Компания</th><th>Ниша</th><th>Дата</th></tr></thead>
 <tbody>{"".join([rows_html]) if rows_html else '<tr><td colspan="4" class="empty">Регистраций ещё нет</td></tr>'}</tbody></table>
 <h2>Заявки на тариф</h2>
-<table><thead><tr><th>Email</th><th>Имя</th><th>Телефон</th><th>Тариф</th><th>Дата</th></tr></thead>
+<table><thead><tr><th>Email</th><th>Контакт</th><th>Комментарий</th><th>Тариф</th><th>Дата</th></tr></thead>
 <tbody>{"".join([plans_html]) if plans_html else '<tr><td colspan="5" class="empty">Заявок ещё нет</td></tr>'}</tbody></table>
 </body></html>"""
             self.send_response(200)
