@@ -669,6 +669,73 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
                 "usage": usage,
             })
 
+        if path == "/admin":
+            import base64
+            admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
+            auth_header = self.headers.get("Authorization", "")
+            authed = False
+            if auth_header.startswith("Basic "):
+                try:
+                    decoded = base64.b64decode(auth_header[6:]).decode()
+                    _, pwd = decoded.split(":", 1)
+                    authed = (pwd == admin_pwd)
+                except Exception:
+                    pass
+            if not authed:
+                self.send_response(401)
+                self.send_header("WWW-Authenticate", 'Basic realm="BizPilot Admin"')
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b"Unauthorized")
+                return
+            with get_db() as conn:
+                total_users = conn.execute("SELECT COUNT(*) as n FROM users").fetchone()["n"]
+                recent_users = conn.execute(
+                    "SELECT u.email, u.created_at, w.active_niche, w.name as ws_name FROM users u LEFT JOIN workspaces w ON w.user_id = u.id ORDER BY u.created_at DESC LIMIT 50"
+                ).fetchall()
+                total_workspaces = conn.execute("SELECT COUNT(*) as n FROM workspaces").fetchone()["n"]
+                total_bookings = conn.execute("SELECT COUNT(*) as n FROM bookings").fetchone()["n"]
+                total_clients = conn.execute("SELECT COUNT(*) as n FROM clients").fetchone()["n"]
+                plan_requests = conn.execute("SELECT email, name, phone, plan, created_at FROM plan_requests ORDER BY created_at DESC LIMIT 20").fetchall()
+            def ts(t):
+                if not t: return "—"
+                try: return datetime.fromtimestamp(int(t)).strftime("%d.%m.%Y %H:%M")
+                except: return str(t)
+            rows_html = ""
+            for u in recent_users:
+                niche_map = {"barbershop": "💈 Барбершоп", "salon": "💅 Салон", "fitness": "🏋️ Фитнес",
+                             "clinic": "🏥 Клиника", "restaurant": "🍽️ Ресторан", "retail": "🛍️ Магазин"}
+                niche = niche_map.get(u["active_niche"], u["active_niche"] or "—")
+                rows_html += f"<tr><td>{u['email']}</td><td>{u['ws_name'] or '—'}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
+            plans_html = ""
+            for p in plan_requests:
+                plans_html += f"<tr><td>{p['email']}</td><td>{p['name'] or '—'}</td><td>{p['phone'] or '—'}</td><td>{p['plan']}</td><td>{ts(p['created_at'])}</td></tr>"
+            html = f"""<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*{{box-sizing:border-box;margin:0;padding:0}}body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#e2e2e8;min-height:100vh;padding:24px}}h1{{font-size:1.6rem;font-weight:700;margin-bottom:4px;color:#a78bfa}}.sub{{color:#6b7280;font-size:.85rem;margin-bottom:28px}}.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px}}.card{{background:#1a1a24;border:1px solid #2a2a3a;border-radius:12px;padding:20px;text-align:center}}.card .num{{font-size:2.4rem;font-weight:800;color:#a78bfa}}.card .lbl{{font-size:.8rem;color:#6b7280;margin-top:4px}}h2{{font-size:1.1rem;font-weight:600;margin-bottom:12px;color:#c4b5fd}}table{{width:100%;border-collapse:collapse;background:#1a1a24;border-radius:12px;overflow:hidden;margin-bottom:32px;border:1px solid #2a2a3a}}th{{background:#2a2a3a;padding:10px 14px;text-align:left;font-size:.78rem;color:#9ca3af;text-transform:uppercase}}td{{padding:10px 14px;border-top:1px solid #2a2a3a;font-size:.87rem}}tr:hover td{{background:#20202e}}.empty{{color:#4b5563;font-style:italic;padding:20px;text-align:center}}</style>
+</head><body>
+<h1>🛡️ BizPilot Admin</h1>
+<div class="sub">Статистика · Обновлено: {datetime.now().strftime("%d.%m.%Y %H:%M")}</div>
+<div class="cards">
+  <div class="card"><div class="num">{total_users}</div><div class="lbl">👥 Пользователей</div></div>
+  <div class="card"><div class="num">{total_workspaces}</div><div class="lbl">🏢 Аккаунтов</div></div>
+  <div class="card"><div class="num">{total_clients}</div><div class="lbl">🧑 Клиентов</div></div>
+  <div class="card"><div class="num">{total_bookings}</div><div class="lbl">📅 Записей</div></div>
+</div>
+<h2>Последние регистрации</h2>
+<table><thead><tr><th>Email</th><th>Компания</th><th>Ниша</th><th>Дата</th></tr></thead>
+<tbody>{"".join([rows_html]) if rows_html else '<tr><td colspan="4" class="empty">Регистраций ещё нет</td></tr>'}</tbody></table>
+<h2>Заявки на тариф</h2>
+<table><thead><tr><th>Email</th><th>Имя</th><th>Телефон</th><th>Тариф</th><th>Дата</th></tr></thead>
+<tbody>{"".join([plans_html]) if plans_html else '<tr><td colspan="5" class="empty">Заявок ещё нет</td></tr>'}</tbody></table>
+</body></html>"""
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(html.encode("utf-8"))
+            return
+
         return super().do_GET()
 
     def do_POST(self):
@@ -1057,103 +1124,6 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
                 return self.send_json(200, {"ok": True, "confirmation_url": (res.get("confirmation") or {}).get("confirmation_url", "")})
             except Exception as exc:
                 return self.send_json(502, {"error": f"Ошибка ЮKassa: {exc}"})
-
-        # ── ADMIN PANEL ──────────────────────────────────────────────────────────
-        if path == "/admin" and method == "GET":
-            admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
-            auth_header = self.headers.get("Authorization", "")
-            # Basic auth check
-            import base64
-            ok = False
-            if auth_header.startswith("Basic "):
-                try:
-                    decoded = base64.b64decode(auth_header[6:]).decode()
-                    _, pwd = decoded.split(":", 1)
-                    ok = (pwd == admin_pwd)
-                except Exception:
-                    ok = False
-            if not ok:
-                self.send_response(401)
-                self.send_header("WWW-Authenticate", 'Basic realm="BizPilot Admin"')
-                self.send_header("Content-Type", "text/plain; charset=utf-8")
-                self.end_headers()
-                self.wfile.write(b"401 Unauthorized")
-                return
-
-            with get_db() as conn:
-                total_users = conn.execute("SELECT COUNT(*) as n FROM users").fetchone()["n"]
-                recent_users = conn.execute(
-                    "SELECT u.email, u.created_at, w.active_niche, w.name as ws_name FROM users u LEFT JOIN workspaces w ON w.user_id = u.id ORDER BY u.created_at DESC LIMIT 50"
-                ).fetchall()
-                total_workspaces = conn.execute("SELECT COUNT(*) as n FROM workspaces").fetchone()["n"]
-                total_bookings = conn.execute("SELECT COUNT(*) as n FROM bookings").fetchone()["n"]
-                total_clients = conn.execute("SELECT COUNT(*) as n FROM clients").fetchone()["n"]
-                plan_requests = conn.execute("SELECT email, name, phone, plan, created_at FROM plan_requests ORDER BY created_at DESC LIMIT 20").fetchall()
-
-            def ts(t):
-                if not t: return "—"
-                try: return datetime.fromtimestamp(int(t)).strftime("%d.%m.%Y %H:%M")
-                except: return str(t)
-
-            rows_html = ""
-            for u in recent_users:
-                niche_map = {"barbershop": "💈 Барбершоп", "salon": "💅 Салон", "fitness": "🏋️ Фитнес",
-                             "clinic": "🏥 Клиника", "restaurant": "🍽️ Ресторан", "retail": "🛍️ Магазин"}
-                niche = niche_map.get(u["active_niche"], u["active_niche"] or "—")
-                rows_html += f"<tr><td>{u['email']}</td><td>{u['ws_name'] or '—'}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
-
-            plans_html = ""
-            for p in plan_requests:
-                plans_html += f"<tr><td>{p['email']}</td><td>{p['name'] or '—'}</td><td>{p['phone'] or '—'}</td><td>{p['plan']}</td><td>{ts(p['created_at'])}</td></tr>"
-
-            html = f"""<!DOCTYPE html>
-<html lang="ru">
-<head><meta charset="utf-8"><title>BizPilot — Admin</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-  *{{box-sizing:border-box;margin:0;padding:0}}
-  body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#e2e2e8;min-height:100vh;padding:24px}}
-  h1{{font-size:1.6rem;font-weight:700;margin-bottom:4px;color:#a78bfa}}
-  .sub{{color:#6b7280;font-size:.85rem;margin-bottom:28px}}
-  .cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px}}
-  .card{{background:#1a1a24;border:1px solid #2a2a3a;border-radius:12px;padding:20px;text-align:center}}
-  .card .num{{font-size:2.4rem;font-weight:800;color:#a78bfa}}
-  .card .lbl{{font-size:.8rem;color:#6b7280;margin-top:4px}}
-  h2{{font-size:1.1rem;font-weight:600;margin-bottom:12px;color:#c4b5fd}}
-  table{{width:100%;border-collapse:collapse;background:#1a1a24;border-radius:12px;overflow:hidden;margin-bottom:32px;border:1px solid #2a2a3a}}
-  th{{background:#2a2a3a;padding:10px 14px;text-align:left;font-size:.78rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}}
-  td{{padding:10px 14px;border-top:1px solid #2a2a3a;font-size:.87rem}}
-  tr:hover td{{background:#20202e}}
-  .badge{{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.75rem;background:#3730a3;color:#c4b5fd}}
-  .empty{{color:#4b5563;font-style:italic;padding:20px;text-align:center}}
-</style>
-</head>
-<body>
-<h1>🛡️ BizPilot Admin</h1>
-<div class="sub">Статистика приложения · Обновлено: {datetime.now().strftime("%d.%m.%Y %H:%M")}</div>
-<div class="cards">
-  <div class="card"><div class="num">{total_users}</div><div class="lbl">👥 Пользователей</div></div>
-  <div class="card"><div class="num">{total_workspaces}</div><div class="lbl">🏢 Рабочих пространств</div></div>
-  <div class="card"><div class="num">{total_clients}</div><div class="lbl">🧑 Клиентов</div></div>
-  <div class="card"><div class="num">{total_bookings}</div><div class="lbl">📅 Записей</div></div>
-</div>
-<h2>Последние регистрации</h2>
-<table>
-<thead><tr><th>Email</th><th>Компания</th><th>Ниша</th><th>Дата регистрации</th></tr></thead>
-<tbody>{"".join([rows_html]) if rows_html else '<tr><td colspan="4" class="empty">Регистраций ещё нет</td></tr>'}</tbody>
-</table>
-<h2>Заявки на тариф</h2>
-<table>
-<thead><tr><th>Email</th><th>Имя</th><th>Телефон</th><th>Тариф</th><th>Дата</th></tr></thead>
-<tbody>{"".join([plans_html]) if plans_html else '<tr><td colspan="5" class="empty">Заявок ещё нет</td></tr>'}</tbody>
-</table>
-</body></html>"""
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(html.encode("utf-8"))
-            return
-        # ── END ADMIN ─────────────────────────────────────────────────────────────
 
         return self.send_json(404, {"error": "Маршрут не найден"})
 
