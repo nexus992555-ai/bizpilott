@@ -670,23 +670,32 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
             })
 
         if path == "/admin":
-            import base64
+            from urllib.parse import parse_qs
             admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
-            auth_header = self.headers.get("Authorization", "")
-            authed = False
-            if auth_header.startswith("Basic "):
-                try:
-                    decoded = base64.b64decode(auth_header[6:]).decode()
-                    _, pwd = decoded.split(":", 1)
-                    authed = (pwd == admin_pwd)
-                except Exception:
-                    pass
+            # Check cookie-based session
+            cookie_header = self.headers.get("Cookie", "")
+            authed = f"admin_session={admin_pwd}" in cookie_header
             if not authed:
-                self.send_response(401)
-                self.send_header("WWW-Authenticate", 'Basic realm="BizPilot Admin"')
-                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                login_html = f"""<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin — Вход</title>
+<style>*{{box-sizing:border-box;margin:0;padding:0}}body{{font-family:-apple-system,sans-serif;background:#0f0f13;display:flex;align-items:center;justify-content:center;min-height:100vh}}
+.box{{background:#1a1a24;border:1px solid #2a2a3a;border-radius:16px;padding:40px;width:320px;text-align:center}}
+h1{{color:#a78bfa;font-size:1.4rem;margin-bottom:8px}}p{{color:#6b7280;font-size:.85rem;margin-bottom:24px}}
+input{{width:100%;padding:10px 14px;background:#0f0f13;border:1px solid #3a3a4a;border-radius:8px;color:#e2e2e8;font-size:1rem;margin-bottom:16px;outline:none}}
+input:focus{{border-color:#a78bfa}}
+button{{width:100%;padding:11px;background:#7c3aed;border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer}}
+button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-top:12px}}</style></head>
+<body><div class="box"><h1>🛡️ Admin</h1><p>BizPilot · Панель управления</p>
+<form method="POST" action="/admin-login">
+<input type="password" name="pwd" placeholder="Пароль" autofocus>
+<button type="submit">Войти</button>
+</form>
+{"<div class='err'>Неверный пароль</div>" if "?err=1" in self.path else ""}
+</div></body></html>"""
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.end_headers()
-                self.wfile.write(b"Unauthorized")
+                self.wfile.write(login_html.encode("utf-8"))
                 return
             with get_db() as conn:
                 total_users = conn.execute("SELECT COUNT(*) as n FROM users").fetchone()["n"]
@@ -741,6 +750,26 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         path = urlparse(self.path).path
         ip = self.client_ip()
+
+        # Admin login form handler
+        if path == "/admin-login":
+            from urllib.parse import parse_qs
+            admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
+            length = int(self.headers.get("Content-Length", 0))
+            post_data = self.rfile.read(length).decode("utf-8")
+            params = parse_qs(post_data)
+            pwd = params.get("pwd", [""])[0]
+            if pwd == admin_pwd:
+                self.send_response(302)
+                self.send_header("Location", "/admin")
+                self.send_header("Set-Cookie", f"admin_session={admin_pwd}; Path=/; HttpOnly; SameSite=Lax")
+                self.end_headers()
+            else:
+                self.send_response(302)
+                self.send_header("Location", "/admin?err=1")
+                self.end_headers()
+            return
+
         if path.startswith("/api/auth/") and not check_rate_limit(ip, "auth", max_hits=25, window_sec=60):
             return self.send_json(429, {"error": "Слишком много попыток. Подождите минуту."})
         if path == "/api/book" and not check_rate_limit(ip, "book", max_hits=15, window_sec=60):
