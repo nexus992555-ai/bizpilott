@@ -1,4 +1,4 @@
-import base64
+﻿import base64
 import hashlib
 import hmac
 import json
@@ -23,41 +23,41 @@ SAAS_PLANS = {
         "id": "starter",
         "name": "Starter",
         "price": 0,
-        "period": "бесплатно",
+        "period": "Р±РµСЃРїР»Р°С‚РЅРѕ",
         "max_staff": 2,
         "max_bookings_month": 50,
         "sms_enabled": False,
-        "features": ["До 2 сотрудников", "До 50 записей в месяц", "CRM и календарь", "Онлайн-запись /book/slug"],
+        "features": ["Р”Рѕ 2 СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ", "Р”Рѕ 50 Р·Р°РїРёСЃРµР№ РІ РјРµСЃСЏС†", "CRM Рё РєР°Р»РµРЅРґР°СЂСЊ", "РћРЅР»Р°Р№РЅ-Р·Р°РїРёСЃСЊ /book/slug"],
     },
     "trial": {
         "id": "trial",
-        "name": "Pro Trial (14 дней)",
+        "name": "Pro Trial (14 РґРЅРµР№)",
         "price": 0,
-        "period": "14 дней",
+        "period": "14 РґРЅРµР№",
         "max_staff": 10,
         "max_bookings_month": 10000,
         "sms_enabled": True,
-        "features": ["Все функции Pro на 14 дней", "До 10 сотрудников", "SMS-напоминания и ЮKassa", "Z-отчёты и аналитика"],
+        "features": ["Р’СЃРµ С„СѓРЅРєС†РёРё Pro РЅР° 14 РґРЅРµР№", "Р”Рѕ 10 СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ", "SMS-РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рё Р®Kassa", "Z-РѕС‚С‡С‘С‚С‹ Рё Р°РЅР°Р»РёС‚РёРєР°"],
     },
     "pro": {
         "id": "pro",
         "name": "Pro",
         "price": 1490,
-        "period": "мес",
+        "period": "РјРµСЃ",
         "max_staff": 10,
         "max_bookings_month": 10000,
         "sms_enabled": True,
-        "features": ["До 10 сотрудников", "Безлимит записей", "SMS-напоминания (SMSC.ru)", "Приём оплат (ЮKassa)", "Z-отчёты и экспорт"],
+        "features": ["Р”Рѕ 10 СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ", "Р‘РµР·Р»РёРјРёС‚ Р·Р°РїРёСЃРµР№", "SMS-РЅР°РїРѕРјРёРЅР°РЅРёСЏ (SMSC.ru)", "РџСЂРёС‘Рј РѕРїР»Р°С‚ (Р®Kassa)", "Z-РѕС‚С‡С‘С‚С‹ Рё СЌРєСЃРїРѕСЂС‚"],
     },
     "business": {
         "id": "business",
         "name": "Business",
         "price": 3490,
-        "period": "мес",
+        "period": "РјРµСЃ",
         "max_staff": 999,
         "max_bookings_month": 100000,
         "sms_enabled": True,
-        "features": ["Безлимит сотрудников и записей", "Все интеграции и вебхуки", "Приоритетная поддержка", "Персональная настройка"],
+        "features": ["Р‘РµР·Р»РёРјРёС‚ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ Рё Р·Р°РїРёСЃРµР№", "Р’СЃРµ РёРЅС‚РµРіСЂР°С†РёРё Рё РІРµР±С…СѓРєРё", "РџСЂРёРѕСЂРёС‚РµС‚РЅР°СЏ РїРѕРґРґРµСЂР¶РєР°", "РџРµСЂСЃРѕРЅР°Р»СЊРЅР°СЏ РЅР°СЃС‚СЂРѕР№РєР°"],
     },
 }
 
@@ -118,7 +118,7 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER UNIQUE NOT NULL,
                 active_niche TEXT NOT NULL DEFAULT 'barbershop',
-                currency TEXT NOT NULL DEFAULT '₽',
+                currency TEXT NOT NULL DEFAULT 'в‚Ѕ',
                 theme TEXT NOT NULL DEFAULT 'light',
                 demo_mode INTEGER NOT NULL DEFAULT 1,
                 onboarding_done INTEGER NOT NULL DEFAULT 1,
@@ -135,7 +135,7 @@ def init_db():
                 business_name TEXT NOT NULL DEFAULT '',
                 address TEXT NOT NULL DEFAULT '',
                 phone TEXT NOT NULL DEFAULT '',
-                hours TEXT NOT NULL DEFAULT '09:00 — 21:00',
+                hours TEXT NOT NULL DEFAULT '09:00 вЂ” 21:00',
                 PRIMARY KEY (workspace_id, niche_id),
                 FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
             );
@@ -146,7 +146,7 @@ def init_db():
                 niche_id TEXT NOT NULL,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL DEFAULT '',
-                segment TEXT NOT NULL DEFAULT 'Новый',
+                segment TEXT NOT NULL DEFAULT 'РќРѕРІС‹Р№',
                 visits INTEGER NOT NULL DEFAULT 0,
                 ltv REAL NOT NULL DEFAULT 0,
                 last_visit TEXT NOT NULL DEFAULT '',
@@ -162,7 +162,7 @@ def init_db():
                 niche_id TEXT NOT NULL,
                 kind TEXT NOT NULL DEFAULT 'service',
                 name TEXT NOT NULL,
-                category TEXT NOT NULL DEFAULT 'Общее',
+                category TEXT NOT NULL DEFAULT 'РћР±С‰РµРµ',
                 price REAL NOT NULL DEFAULT 0,
                 duration INTEGER NOT NULL DEFAULT 60,
                 cost REAL NOT NULL DEFAULT 0,
@@ -181,7 +181,7 @@ def init_db():
                 niche_id TEXT NOT NULL,
                 name TEXT NOT NULL,
                 role TEXT NOT NULL DEFAULT '',
-                status TEXT NOT NULL DEFAULT 'На смене',
+                status TEXT NOT NULL DEFAULT 'РќР° СЃРјРµРЅРµ',
                 busy INTEGER NOT NULL DEFAULT 60,
                 rating REAL NOT NULL DEFAULT 5.0,
                 bookings_count INTEGER NOT NULL DEFAULT 0,
@@ -448,7 +448,7 @@ def save_workspace_state(conn, user_id: int, state: dict):
             """,
             (
                 state.get("activeNiche", "barbershop"),
-                state.get("currency", "₽"),
+                state.get("currency", "в‚Ѕ"),
                 state.get("theme", "light"),
                 1 if state.get("demoMode", False) else 0,
                 1 if state.get("onboardingDone", True) else 0,
@@ -467,7 +467,7 @@ def save_workspace_state(conn, user_id: int, state: dict):
             (
                 user_id,
                 state.get("activeNiche", "barbershop"),
-                state.get("currency", "₽"),
+                state.get("currency", "в‚Ѕ"),
                 state.get("theme", "light"),
                 1 if state.get("demoMode", False) else 0,
                 1 if state.get("onboardingDone", True) else 0,
@@ -495,17 +495,17 @@ def save_workspace_state(conn, user_id: int, state: dict):
         for c in ndata.get("clients", []):
             conn.execute(
                 "INSERT INTO clients (id, workspace_id, niche_id, name, phone, segment, visits, ltv, last_visit, note, tag) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (c["id"], ws_id, nid, c.get("name", ""), c.get("phone", ""), c.get("segment", "Новый"), int(c.get("visits", 0)), float(c.get("ltv", 0)), c.get("lastVisit", ""), c.get("note", ""), c.get("tag", "")),
+                (c["id"], ws_id, nid, c.get("name", ""), c.get("phone", ""), c.get("segment", "РќРѕРІС‹Р№"), int(c.get("visits", 0)), float(c.get("ltv", 0)), c.get("lastVisit", ""), c.get("note", ""), c.get("tag", "")),
             )
         for s in ndata.get("services", []):
             conn.execute(
                 "INSERT INTO services (id, workspace_id, niche_id, kind, name, category, price, duration, cost, stock, min_stock, sku, active, popular) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (s["id"], ws_id, nid, s.get("kind", "service"), s.get("name", ""), s.get("category", "Общее"), float(s.get("price", 0)), int(s.get("duration", 60)), float(s.get("cost", 0)), s.get("stock"), s.get("minStock"), s.get("sku"), 1 if s.get("active", True) else 0, int(s.get("popular", 65))),
+                (s["id"], ws_id, nid, s.get("kind", "service"), s.get("name", ""), s.get("category", "РћР±С‰РµРµ"), float(s.get("price", 0)), int(s.get("duration", 60)), float(s.get("cost", 0)), s.get("stock"), s.get("minStock"), s.get("sku"), 1 if s.get("active", True) else 0, int(s.get("popular", 65))),
             )
         for st in ndata.get("staff", []):
             conn.execute(
                 "INSERT INTO staff (id, workspace_id, niche_id, name, role, status, busy, rating, bookings_count, revenue, commission, schedule, tags_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (st["id"], ws_id, nid, st.get("name", ""), st.get("role", ""), st.get("status", "На смене"), int(st.get("busy", 60)), float(st.get("rating", 5.0)), int(st.get("bookingsCount", 0)), float(st.get("revenue", 0)), st.get("commission", "40%"), st.get("schedule", ""), json.dumps(st.get("tags", []), ensure_ascii=False)),
+                (st["id"], ws_id, nid, st.get("name", ""), st.get("role", ""), st.get("status", "РќР° СЃРјРµРЅРµ"), int(st.get("busy", 60)), float(st.get("rating", 5.0)), int(st.get("bookingsCount", 0)), float(st.get("revenue", 0)), st.get("commission", "40%"), st.get("schedule", ""), json.dumps(st.get("tags", []), ensure_ascii=False)),
             )
         for b in ndata.get("bookings", []):
             conn.execute(
@@ -561,17 +561,17 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
         if path == "/api/auth/me":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             with get_db() as conn:
                 user = conn.execute("SELECT id, email, name, role FROM users WHERE id = ?", (claims["uid"],)).fetchone()
                 if not user:
-                    return self.send_json(401, {"error": "Пользователь не найден"})
+                    return self.send_json(401, {"error": "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ"})
                 return self.send_json(200, {"user": dict(user)})
 
         if path == "/api/workspace":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             with get_db() as conn:
                 state = load_workspace_state(conn, claims["uid"])
                 return self.send_json(200, {"state": state})
@@ -580,11 +580,11 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
         if path.startswith("/api/book/"):
             slug = path[len("/api/book/"):].strip("/")
             if not slug:
-                return self.send_json(400, {"error": "Slug не указан"})
+                return self.send_json(400, {"error": "Slug РЅРµ СѓРєР°Р·Р°РЅ"})
             with get_db() as conn:
                 ws = conn.execute("SELECT * FROM workspaces WHERE slug = ?", (slug,)).fetchone()
                 if not ws:
-                    return self.send_json(404, {"error": "Бизнес не найден"})
+                    return self.send_json(404, {"error": "Р‘РёР·РЅРµСЃ РЅРµ РЅР°Р№РґРµРЅ"})
                 ws_id = ws["id"]
                 niche_id = ws["active_niche"]
                 profile = conn.execute(
@@ -625,14 +625,14 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
                     "niche_label": niche_id,
                     "address": profile["address"] if profile else "",
                     "phone": profile["phone"] if profile else "",
-                    "hours": profile["hours"] if profile else "09:00 — 21:00",
+                    "hours": profile["hours"] if profile else "09:00 вЂ” 21:00",
                     "accent": settings.get("accentColor", "#6366f1"),
                     "services": services,
                     "staff": staff_rows,
                     "booked_slots": booked,
                 })
 
-        # Serve /book/<slug> → booking.html SPA
+        # Serve /book/<slug> в†’ booking.html SPA
         if path.startswith("/book/"):
             booking_path = os.path.join(BASE_DIR, "booking.html")
             if os.path.exists(booking_path):
@@ -669,7 +669,7 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
                 "usage": usage,
             })
 
-        if path == "/admin":
+        if path == "/_admin_panel":
             from urllib.parse import parse_qs
             admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
             # Check cookie-based session
@@ -677,7 +677,7 @@ class BizPilotHandler(SimpleHTTPRequestHandler):
             authed = f"admin_session={admin_pwd}" in cookie_header
             if not authed:
                 login_html = f"""<!DOCTYPE html>
-<html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin — Вход</title>
+<html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin вЂ” Р’С…РѕРґ</title>
 <style>*{{box-sizing:border-box;margin:0;padding:0}}body{{font-family:-apple-system,sans-serif;background:#0f0f13;display:flex;align-items:center;justify-content:center;min-height:100vh}}
 .box{{background:#1a1a24;border:1px solid #2a2a3a;border-radius:16px;padding:40px;width:320px;text-align:center}}
 h1{{color:#a78bfa;font-size:1.4rem;margin-bottom:8px}}p{{color:#6b7280;font-size:.85rem;margin-bottom:24px}}
@@ -685,12 +685,12 @@ input{{width:100%;padding:10px 14px;background:#0f0f13;border:1px solid #3a3a4a;
 input:focus{{border-color:#a78bfa}}
 button{{width:100%;padding:11px;background:#7c3aed;border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer}}
 button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-top:12px}}</style></head>
-<body><div class="box"><h1>🛡️ Admin</h1><p>BizPilot · Панель управления</p>
-<form method="POST" action="/admin-login">
-<input type="password" name="pwd" placeholder="Пароль" autofocus>
-<button type="submit">Войти</button>
+<body><div class="box"><h1>рџ›ЎпёЏ Admin</h1><p>BizPilot В· РџР°РЅРµР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ</p>
+<form method="POST" action="/_admin_panel_login">
+<input type="password" name="pwd" placeholder="РџР°СЂРѕР»СЊ" autofocus>
+<button type="submit">Р’РѕР№С‚Рё</button>
 </form>
-{"<div class='err'>Неверный пароль</div>" if "?err=1" in self.path else ""}
+{"<div class='err'>РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ</div>" if "?err=1" in self.path else ""}
 </div></body></html>"""
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -707,37 +707,37 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 total_clients = conn.execute("SELECT COUNT(*) as n FROM clients").fetchone()["n"]
                 plan_requests = conn.execute("SELECT email, name, phone, plan, created_at FROM plan_requests ORDER BY created_at DESC LIMIT 20").fetchall()
             def ts(t):
-                if not t: return "—"
+                if not t: return "вЂ”"
                 try: return datetime.fromtimestamp(int(t)).strftime("%d.%m.%Y %H:%M")
                 except: return str(t)
             rows_html = ""
             for u in recent_users:
-                niche_map = {"barbershop": "💈 Барбершоп", "salon": "💅 Салон", "fitness": "🏋️ Фитнес",
-                             "clinic": "🏥 Клиника", "restaurant": "🍽️ Ресторан", "retail": "🛍️ Магазин"}
-                niche = niche_map.get(u["active_niche"], u["active_niche"] or "—")
-                rows_html += f"<tr><td>{u['email']}</td><td>{u['ws_name'] or '—'}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
+                niche_map = {"barbershop": "рџ’€ Р‘Р°СЂР±РµСЂС€РѕРї", "salon": "рџ’… РЎР°Р»РѕРЅ", "fitness": "рџЏ‹пёЏ Р¤РёС‚РЅРµСЃ",
+                             "clinic": "рџЏҐ РљР»РёРЅРёРєР°", "restaurant": "рџЌЅпёЏ Р РµСЃС‚РѕСЂР°РЅ", "retail": "рџ›ЌпёЏ РњР°РіР°Р·РёРЅ"}
+                niche = niche_map.get(u["active_niche"], u["active_niche"] or "вЂ”")
+                rows_html += f"<tr><td>{u['email']}</td><td>{u['ws_name'] or 'вЂ”'}</td><td>{niche}</td><td>{ts(u['created_at'])}</td></tr>"
             plans_html = ""
             for p in plan_requests:
-                plans_html += f"<tr><td>{p['email']}</td><td>{p['name'] or '—'}</td><td>{p['phone'] or '—'}</td><td>{p['plan']}</td><td>{ts(p['created_at'])}</td></tr>"
+                plans_html += f"<tr><td>{p['email']}</td><td>{p['name'] or 'вЂ”'}</td><td>{p['phone'] or 'вЂ”'}</td><td>{p['plan']}</td><td>{ts(p['created_at'])}</td></tr>"
             html = f"""<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"><title>BizPilot Admin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>*{{box-sizing:border-box;margin:0;padding:0}}body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#e2e2e8;min-height:100vh;padding:24px}}h1{{font-size:1.6rem;font-weight:700;margin-bottom:4px;color:#a78bfa}}.sub{{color:#6b7280;font-size:.85rem;margin-bottom:28px}}.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px}}.card{{background:#1a1a24;border:1px solid #2a2a3a;border-radius:12px;padding:20px;text-align:center}}.card .num{{font-size:2.4rem;font-weight:800;color:#a78bfa}}.card .lbl{{font-size:.8rem;color:#6b7280;margin-top:4px}}h2{{font-size:1.1rem;font-weight:600;margin-bottom:12px;color:#c4b5fd}}table{{width:100%;border-collapse:collapse;background:#1a1a24;border-radius:12px;overflow:hidden;margin-bottom:32px;border:1px solid #2a2a3a}}th{{background:#2a2a3a;padding:10px 14px;text-align:left;font-size:.78rem;color:#9ca3af;text-transform:uppercase}}td{{padding:10px 14px;border-top:1px solid #2a2a3a;font-size:.87rem}}tr:hover td{{background:#20202e}}.empty{{color:#4b5563;font-style:italic;padding:20px;text-align:center}}</style>
 </head><body>
-<h1>🛡️ BizPilot Admin</h1>
-<div class="sub">Статистика · Обновлено: {datetime.now().strftime("%d.%m.%Y %H:%M")}</div>
+<h1>рџ›ЎпёЏ BizPilot Admin</h1>
+<div class="sub">РЎС‚Р°С‚РёСЃС‚РёРєР° В· РћР±РЅРѕРІР»РµРЅРѕ: {datetime.now().strftime("%d.%m.%Y %H:%M")}</div>
 <div class="cards">
-  <div class="card"><div class="num">{total_users}</div><div class="lbl">👥 Пользователей</div></div>
-  <div class="card"><div class="num">{total_workspaces}</div><div class="lbl">🏢 Аккаунтов</div></div>
-  <div class="card"><div class="num">{total_clients}</div><div class="lbl">🧑 Клиентов</div></div>
-  <div class="card"><div class="num">{total_bookings}</div><div class="lbl">📅 Записей</div></div>
+  <div class="card"><div class="num">{total_users}</div><div class="lbl">рџ‘Ґ РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№</div></div>
+  <div class="card"><div class="num">{total_workspaces}</div><div class="lbl">рџЏў РђРєРєР°СѓРЅС‚РѕРІ</div></div>
+  <div class="card"><div class="num">{total_clients}</div><div class="lbl">рџ§‘ РљР»РёРµРЅС‚РѕРІ</div></div>
+  <div class="card"><div class="num">{total_bookings}</div><div class="lbl">рџ“… Р—Р°РїРёСЃРµР№</div></div>
 </div>
-<h2>Последние регистрации</h2>
-<table><thead><tr><th>Email</th><th>Компания</th><th>Ниша</th><th>Дата</th></tr></thead>
-<tbody>{"".join([rows_html]) if rows_html else '<tr><td colspan="4" class="empty">Регистраций ещё нет</td></tr>'}</tbody></table>
-<h2>Заявки на тариф</h2>
-<table><thead><tr><th>Email</th><th>Имя</th><th>Телефон</th><th>Тариф</th><th>Дата</th></tr></thead>
-<tbody>{"".join([plans_html]) if plans_html else '<tr><td colspan="5" class="empty">Заявок ещё нет</td></tr>'}</tbody></table>
+<h2>РџРѕСЃР»РµРґРЅРёРµ СЂРµРіРёСЃС‚СЂР°С†РёРё</h2>
+<table><thead><tr><th>Email</th><th>РљРѕРјРїР°РЅРёСЏ</th><th>РќРёС€Р°</th><th>Р”Р°С‚Р°</th></tr></thead>
+<tbody>{"".join([rows_html]) if rows_html else '<tr><td colspan="4" class="empty">Р РµРіРёСЃС‚СЂР°С†РёР№ РµС‰С‘ РЅРµС‚</td></tr>'}</tbody></table>
+<h2>Р—Р°СЏРІРєРё РЅР° С‚Р°СЂРёС„</h2>
+<table><thead><tr><th>Email</th><th>РРјСЏ</th><th>РўРµР»РµС„РѕРЅ</th><th>РўР°СЂРёС„</th><th>Р”Р°С‚Р°</th></tr></thead>
+<tbody>{"".join([plans_html]) if plans_html else '<tr><td colspan="5" class="empty">Р—Р°СЏРІРѕРє РµС‰С‘ РЅРµС‚</td></tr>'}</tbody></table>
 </body></html>"""
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -752,7 +752,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         ip = self.client_ip()
 
         # Admin login form handler
-        if path == "/admin-login":
+        if path == "/_admin_panel_login":
             from urllib.parse import parse_qs
             admin_pwd = os.environ.get("ADMIN_PASSWORD", "bizpilot-admin-2024")
             length = int(self.headers.get("Content-Length", 0))
@@ -761,38 +761,38 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
             pwd = params.get("pwd", [""])[0]
             if pwd == admin_pwd:
                 self.send_response(302)
-                self.send_header("Location", "/admin")
+                self.send_header("Location", "/_admin_panel")
                 self.send_header("Set-Cookie", f"admin_session={admin_pwd}; Path=/; HttpOnly; SameSite=Lax")
                 self.end_headers()
             else:
                 self.send_response(302)
-                self.send_header("Location", "/admin?err=1")
+                self.send_header("Location", "/_admin_panel?err=1")
                 self.end_headers()
             return
 
         if path.startswith("/api/auth/") and not check_rate_limit(ip, "auth", max_hits=25, window_sec=60):
-            return self.send_json(429, {"error": "Слишком много попыток. Подождите минуту."})
+            return self.send_json(429, {"error": "РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РїРѕРїС‹С‚РѕРє. РџРѕРґРѕР¶РґРёС‚Рµ РјРёРЅСѓС‚Сѓ."})
         if path == "/api/book" and not check_rate_limit(ip, "book", max_hits=15, window_sec=60):
-            return self.send_json(429, {"error": "Слишком много запросов. Повторите позже."})
+            return self.send_json(429, {"error": "РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ Р·Р°РїСЂРѕСЃРѕРІ. РџРѕРІС‚РѕСЂРёС‚Рµ РїРѕР·Р¶Рµ."})
         try:
             body = self.read_json_body()
         except Exception:
-            return self.send_json(400, {"error": "Некорректный JSON"})
+            return self.send_json(400, {"error": "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ JSON"})
 
         if path == "/api/auth/register":
             email = (body.get("email") or "").strip().lower()
             password = body.get("password") or ""
-            name = (body.get("name") or "").strip() or "Владелец"
+            name = (body.get("name") or "").strip() or "Р’Р»Р°РґРµР»РµС†"
             if not email or "@" not in email:
-                return self.send_json(400, {"error": "Укажите корректный email"})
+                return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ email"})
             if len(password) < 6:
-                return self.send_json(400, {"error": "Пароль должен быть не короче 6 символов"})
+                return self.send_json(400, {"error": "РџР°СЂРѕР»СЊ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµ РєРѕСЂРѕС‡Рµ 6 СЃРёРјРІРѕР»РѕРІ"})
 
             pw_hash, salt = hash_password(password)
             with get_db() as conn:
                 existing = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
                 if existing:
-                    return self.send_json(409, {"error": "Пользователь с таким email уже существует"})
+                    return self.send_json(409, {"error": "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј email СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚"})
                 cur = conn.execute(
                     "INSERT INTO users (email, password_hash, salt, name, role, created_at) VALUES (?, ?, ?, ?, 'owner', ?)",
                     (email, pw_hash, salt, name, int(time.time())),
@@ -812,7 +812,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
             with get_db() as conn:
                 user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
                 if not user or not verify_password(password, user["password_hash"], user["salt"]):
-                    return self.send_json(401, {"error": "Неверный email или пароль"})
+                    return self.send_json(401, {"error": "РќРµРІРµСЂРЅС‹Р№ email РёР»Рё РїР°СЂРѕР»СЊ"})
                 token = sign_token(user["id"], user["email"], user["role"])
                 state = load_workspace_state(conn, user["id"])
                 return self.send_json(200, {
@@ -825,11 +825,11 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         if path == "/api/book":
             slug = (body.get("slug") or "").strip()
             if not slug:
-                return self.send_json(400, {"error": "Slug не указан"})
+                return self.send_json(400, {"error": "Slug РЅРµ СѓРєР°Р·Р°РЅ"})
             with get_db() as conn:
                 ws = conn.execute("SELECT * FROM workspaces WHERE slug = ?", (slug,)).fetchone()
                 if not ws:
-                    return self.send_json(404, {"error": "Бизнес не найден"})
+                    return self.send_json(404, {"error": "Р‘РёР·РЅРµСЃ РЅРµ РЅР°Р№РґРµРЅ"})
                 ws_id = ws["id"]
                 niche_id = ws["active_niche"]
                 client = body.get("client") or {}
@@ -838,22 +838,22 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 service_id = str(body.get("service_id") or "")
                 staff_id = str(body.get("staff_id") or "")
                 if not client.get("name") or not client.get("phone"):
-                    return self.send_json(400, {"error": "Имя и телефон обязательны"})
+                    return self.send_json(400, {"error": "РРјСЏ Рё С‚РµР»РµС„РѕРЅ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹"})
                 if not date or not time_slot:
-                    return self.send_json(400, {"error": "Дата и время обязательны"})
+                    return self.send_json(400, {"error": "Р”Р°С‚Р° Рё РІСЂРµРјСЏ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹"})
                 # Check if slot is taken
                 taken = conn.execute(
                     "SELECT id FROM bookings WHERE workspace_id=? AND niche_id=? AND date=? AND time=? AND status!='cancelled'",
                     (ws_id, niche_id, date, time_slot)
                 ).fetchone()
                 if taken:
-                    return self.send_json(409, {"error": "Это время уже занято, выберите другое"})
+                    return self.send_json(409, {"error": "Р­С‚Рѕ РІСЂРµРјСЏ СѓР¶Рµ Р·Р°РЅСЏС‚Рѕ, РІС‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕРµ"})
                 taken2 = conn.execute(
                     "SELECT id FROM public_bookings WHERE workspace_id=? AND niche_id=? AND date=? AND time=? AND status!='cancelled'",
                     (ws_id, niche_id, date, time_slot)
                 ).fetchone()
                 if taken2:
-                    return self.send_json(409, {"error": "Это время уже занято, выберите другое"})
+                    return self.send_json(409, {"error": "Р­С‚Рѕ РІСЂРµРјСЏ СѓР¶Рµ Р·Р°РЅСЏС‚Рѕ, РІС‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕРµ"})
 
                 booking_id = "bk-" + secrets.token_hex(4)
                 conn.execute(
@@ -878,7 +878,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 else:
                     client_id = "cl-" + secrets.token_hex(4)
                     conn.execute(
-                        "INSERT INTO clients (id, workspace_id, niche_id, name, phone, segment, visits, ltv, last_visit, note, tag) VALUES (?, ?, ?, ?, ?, 'Новый', 0, 0, ?, ?, 'Онлайн')",
+                        "INSERT INTO clients (id, workspace_id, niche_id, name, phone, segment, visits, ltv, last_visit, note, tag) VALUES (?, ?, ?, ?, ?, 'РќРѕРІС‹Р№', 0, 0, ?, ?, 'РћРЅР»Р°Р№РЅ')",
                         (client_id, ws_id, niche_id, c_name, c_phone, date, client.get("note", ""))
                     )
 
@@ -890,7 +890,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 svc_dur = int(svc_row["duration"]) if svc_row else 60
 
                 conn.execute(
-                    "INSERT INTO bookings (id, workspace_id, niche_id, client_id, staff_id, service_id, date, time, duration, price, status, extra, channel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, 'Онлайн-виджет')",
+                    "INSERT INTO bookings (id, workspace_id, niche_id, client_id, staff_id, service_id, date, time, duration, price, status, extra, channel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, 'РћРЅР»Р°Р№РЅ-РІРёРґР¶РµС‚')",
                     (booking_id, ws_id, niche_id, client_id, staff_id, service_id, date, time_slot, svc_dur, svc_price, client.get("note", ""))
                 )
 
@@ -901,8 +901,8 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 conn.execute(
                     "INSERT INTO notifications (id, workspace_id, title, time_label, unread) VALUES (?, ?, ?, ?, 1)",
                     (notif_id, ws_id,
-                     f"Новая онлайн-запись: {client.get('name','')} на {date_fmt} в {time_slot}",
-                     "только что")
+                     f"РќРѕРІР°СЏ РѕРЅР»Р°Р№РЅ-Р·Р°РїРёСЃСЊ: {client.get('name','')} РЅР° {date_fmt} РІ {time_slot}",
+                     "С‚РѕР»СЊРєРѕ С‡С‚Рѕ")
                 )
                 return self.send_json(201, {"ok": True, "booking_id": booking_id})
 
@@ -910,11 +910,11 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         if path == "/api/notify/sms":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             phone = (body.get("phone") or "").strip()
             message = (body.get("message") or "").strip()
             if not phone or not message:
-                return self.send_json(400, {"error": "Укажите телефон и текст сообщения"})
+                return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ С‚РµР»РµС„РѕРЅ Рё С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ"})
 
             with get_db() as conn:
                 ws = conn.execute("SELECT settings_json FROM workspaces WHERE user_id = ?", (claims["uid"],)).fetchone()
@@ -924,7 +924,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
 
             if body.get("dryRun") or not (login and psw):
                 if not (login and psw) and not body.get("dryRun"):
-                    return self.send_json(400, {"error": "Укажите логин и пароль/API-ключ SMSC.ru в Настройках"})
+                    return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ Р»РѕРіРёРЅ Рё РїР°СЂРѕР»СЊ/API-РєР»СЋС‡ SMSC.ru РІ РќР°СЃС‚СЂРѕР№РєР°С…"})
                 return self.send_json(200, {"ok": True, "dryRun": True, "phone": phone, "message": message})
 
             import urllib.request
@@ -944,31 +944,31 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                     return self.send_json(502, {"error": f"SMSC.ru: {res.get('error')}"})
                 return self.send_json(200, {"ok": True, "result": res})
             except Exception as exc:
-                return self.send_json(502, {"error": f"Ошибка отправки SMS: {exc}"})
+                return self.send_json(502, {"error": f"РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё SMS: {exc}"})
 
         # YooKassa payment creation
         if path == "/api/payments/create":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             amount = body.get("amount")
-            description = (body.get("description") or "Оплата услуги BizPilot").strip()
+            description = (body.get("description") or "РћРїР»Р°С‚Р° СѓСЃР»СѓРіРё BizPilot").strip()
             booking_id = str(body.get("booking_id") or "")
             return_url = (body.get("return_url") or "http://localhost:8123").strip()
             if not amount or float(amount) <= 0:
-                return self.send_json(400, {"error": "Укажите корректную сумму"})
+                return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅСѓСЋ СЃСѓРјРјСѓ"})
 
             with get_db() as conn:
                 ws = conn.execute("SELECT id, settings_json FROM workspaces WHERE user_id = ?", (claims["uid"],)).fetchone()
                 if not ws:
-                    return self.send_json(404, {"error": "Workspace не найден"})
+                    return self.send_json(404, {"error": "Workspace РЅРµ РЅР°Р№РґРµРЅ"})
                 settings = json.loads(ws["settings_json"] or "{}")
                 shop_id = (body.get("shop_id") or settings.get("yookassaShopId") or "").strip()
                 secret_key = (body.get("secret_key") or settings.get("yookassaSecretKey") or "").strip()
 
                 if body.get("dryRun") or not (shop_id and secret_key):
                     if not (shop_id and secret_key) and not body.get("dryRun"):
-                        return self.send_json(400, {"error": "Укажите Shop ID и Секретный ключ ЮKassa в Настройках"})
+                        return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ Shop ID Рё РЎРµРєСЂРµС‚РЅС‹Р№ РєР»СЋС‡ Р®Kassa РІ РќР°СЃС‚СЂРѕР№РєР°С…"})
                     pay_id = "pay-dry-" + secrets.token_hex(4)
                     conn.execute(
                         "INSERT INTO payments (id, workspace_id, booking_id, amount, currency, status, provider, created_at) VALUES (?, ?, ?, ?, 'RUB', 'pending', 'yookassa', ?)",
@@ -1013,7 +1013,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 conf_url = (res.get("confirmation") or {}).get("confirmation_url", "")
                 return self.send_json(200, {"ok": True, "payment_id": pay_id, "confirmation_url": conf_url, "status": res.get("status")})
             except Exception as exc:
-                return self.send_json(502, {"error": f"Ошибка ЮKassa: {exc}"})
+                return self.send_json(502, {"error": f"РћС€РёР±РєР° Р®Kassa: {exc}"})
 
         # YooKassa webhook
         if path == "/api/payments/webhook":
@@ -1039,11 +1039,11 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         if path == "/api/auth/forgot":
             email = (body.get("email") or "").strip().lower()
             if not email or "@" not in email:
-                return self.send_json(400, {"error": "Укажите корректный email"})
+                return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ email"})
             with get_db() as conn:
                 user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
                 if not user:
-                    return self.send_json(200, {"ok": True, "message": "Если аккаунт существует, код отправлен"})
+                    return self.send_json(200, {"ok": True, "message": "Р•СЃР»Рё Р°РєРєР°СѓРЅС‚ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РєРѕРґ РѕС‚РїСЂР°РІР»РµРЅ"})
                 code = f"{secrets.randbelow(900000) + 100000}"
                 conn.execute(
                     "INSERT INTO password_resets (email, code, expires_at, used) VALUES (?, ?, ?, 0)",
@@ -1057,10 +1057,10 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                     import smtplib
                     from email.message import EmailMessage
                     msg = EmailMessage()
-                    msg["Subject"] = "BizPilot: код восстановления пароля"
+                    msg["Subject"] = "BizPilot: РєРѕРґ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїР°СЂРѕР»СЏ"
                     msg["From"] = os.environ.get("SMTP_FROM", "noreply@bizpilot.ru")
                     msg["To"] = email
-                    msg.set_content(f"Ваш код восстановления пароля: {code}\nДействует 15 минут.")
+                    msg.set_content(f"Р’Р°С€ РєРѕРґ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїР°СЂРѕР»СЏ: {code}\nР”РµР№СЃС‚РІСѓРµС‚ 15 РјРёРЅСѓС‚.")
                     with smtplib.SMTP(smtp_host, int(os.environ.get("SMTP_PORT", "587")), timeout=10) as s:
                         s.starttls()
                         if os.environ.get("SMTP_USER"):
@@ -1070,7 +1070,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 except Exception as exc:
                     print(f"[SMTP] Failed to send reset email: {exc}")
             print(f"[Auth] Password reset code for {email}: {code}")
-            resp = {"ok": True, "message": "Код восстановления отправлен на email"}
+            resp = {"ok": True, "message": "РљРѕРґ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РѕС‚РїСЂР°РІР»РµРЅ РЅР° email"}
             if not sent_email and os.environ.get("BIZPILOT_ENV", "dev") != "production":
                 resp["dev_code"] = code
             return self.send_json(200, resp)
@@ -1081,25 +1081,25 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
             code = (body.get("code") or "").strip()
             new_password = body.get("new_password") or ""
             if len(new_password) < 6:
-                return self.send_json(400, {"error": "Новый пароль должен быть не короче 6 символов"})
+                return self.send_json(400, {"error": "РќРѕРІС‹Р№ РїР°СЂРѕР»СЊ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµ РєРѕСЂРѕС‡Рµ 6 СЃРёРјРІРѕР»РѕРІ"})
             with get_db() as conn:
                 row = conn.execute(
                     "SELECT * FROM password_resets WHERE email=? AND code=? AND used=0 ORDER BY id DESC LIMIT 1",
                     (email, code)
                 ).fetchone()
                 if not row or row["expires_at"] < int(time.time()):
-                    return self.send_json(400, {"error": "Неверный или просроченный код"})
+                    return self.send_json(400, {"error": "РќРµРІРµСЂРЅС‹Р№ РёР»Рё РїСЂРѕСЃСЂРѕС‡РµРЅРЅС‹Р№ РєРѕРґ"})
                 pw_hash, salt = hash_password(new_password)
                 conn.execute("UPDATE users SET password_hash=?, salt=? WHERE email=?", (pw_hash, salt, email))
                 conn.execute("UPDATE password_resets SET used=1 WHERE id=?", (row["id"],))
-            return self.send_json(200, {"ok": True, "message": "Пароль успешно изменён"})
+            return self.send_json(200, {"ok": True, "message": "РџР°СЂРѕР»СЊ СѓСЃРїРµС€РЅРѕ РёР·РјРµРЅС‘РЅ"})
 
         # Beta plan / support request: POST /api/billing/request
         if path == "/api/billing/request":
             claims = self.get_auth_user()
             contact = (body.get("contact") or "").strip()
             if not contact:
-                return self.send_json(400, {"error": "Укажите контакт для связи"})
+                return self.send_json(400, {"error": "РЈРєР°Р¶РёС‚Рµ РєРѕРЅС‚Р°РєС‚ РґР»СЏ СЃРІСЏР·Рё"})
             with get_db() as conn:
                 conn.execute(
                     "INSERT INTO plan_requests (user_id, plan_id, contact, comment, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -1111,15 +1111,15 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         if path == "/api/billing/subscribe":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             plan_id = (body.get("plan_id") or "").strip()
             if plan_id not in SAAS_PLANS or plan_id == "trial":
-                return self.send_json(400, {"error": "Некорректный тариф"})
+                return self.send_json(400, {"error": "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ С‚Р°СЂРёС„"})
             plan = SAAS_PLANS[plan_id]
             with get_db() as conn:
                 ws = conn.execute("SELECT id FROM workspaces WHERE user_id = ?", (claims["uid"],)).fetchone()
                 if not ws:
-                    return self.send_json(404, {"error": "Workspace не найден"})
+                    return self.send_json(404, {"error": "Workspace РЅРµ РЅР°Р№РґРµРЅ"})
                 if plan["price"] == 0:
                     conn.execute("UPDATE workspaces SET plan='starter', plan_expires_at=0 WHERE id=?", (ws["id"],))
                     return self.send_json(200, {"ok": True, "plan": "starter", "activated": True})
@@ -1138,7 +1138,7 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                 "amount": {"value": f"{plan['price']:.2f}", "currency": "RUB"},
                 "confirmation": {"type": "redirect", "return_url": return_url},
                 "capture": True,
-                "description": f"Подписка BizPilot {plan['name']} (30 дней)",
+                "description": f"РџРѕРґРїРёСЃРєР° BizPilot {plan['name']} (30 РґРЅРµР№)",
                 "metadata": {"type": "saas_subscription", "workspace_id": ws["id"], "plan_id": plan_id},
             }).encode("utf-8")
             req = urllib.request.Request(
@@ -1152,23 +1152,23 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                     res = json.loads(resp.read().decode("utf-8"))
                 return self.send_json(200, {"ok": True, "confirmation_url": (res.get("confirmation") or {}).get("confirmation_url", "")})
             except Exception as exc:
-                return self.send_json(502, {"error": f"Ошибка ЮKassa: {exc}"})
+                return self.send_json(502, {"error": f"РћС€РёР±РєР° Р®Kassa: {exc}"})
 
-        return self.send_json(404, {"error": "Маршрут не найден"})
+        return self.send_json(404, {"error": "РњР°СЂС€СЂСѓС‚ РЅРµ РЅР°Р№РґРµРЅ"})
 
     def do_PUT(self):
         path = urlparse(self.path).path
         if path == "/api/workspace":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             try:
                 body = self.read_json_body()
             except Exception:
-                return self.send_json(400, {"error": "Некорректный JSON"})
+                return self.send_json(400, {"error": "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ JSON"})
             state = body.get("state")
             if not isinstance(state, dict):
-                return self.send_json(400, {"error": "Поле state обязательно"})
+                return self.send_json(400, {"error": "РџРѕР»Рµ state РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ"})
             with get_db() as conn:
                 save_workspace_state(conn, claims["uid"], state)
             return self.send_json(200, {"ok": True})
@@ -1176,15 +1176,15 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
         if path == "/api/workspace/slug":
             claims = self.get_auth_user()
             if not claims:
-                return self.send_json(401, {"error": "Не авторизован"})
+                return self.send_json(401, {"error": "РќРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ"})
             try:
                 body = self.read_json_body()
             except Exception:
-                return self.send_json(400, {"error": "Некорректный JSON"})
+                return self.send_json(400, {"error": "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ JSON"})
             slug = (body.get("slug") or "").strip().lower()
             import re
             if not slug or not re.match(r'^[a-z0-9\-]{3,40}$', slug):
-                return self.send_json(400, {"error": "Slug: 3-40 символов, только латиница, цифры и дефис"})
+                return self.send_json(400, {"error": "Slug: 3-40 СЃРёРјРІРѕР»РѕРІ, С‚РѕР»СЊРєРѕ Р»Р°С‚РёРЅРёС†Р°, С†РёС„СЂС‹ Рё РґРµС„РёСЃ"})
             with get_db() as conn:
                 # Check uniqueness
                 existing = conn.execute(
@@ -1192,14 +1192,14 @@ button:hover{{background:#6d28d9}}.err{{color:#f87171;font-size:.85rem;margin-to
                     (slug, claims["uid"])
                 ).fetchone()
                 if existing:
-                    return self.send_json(409, {"error": "Этот slug уже занят, выберите другой"})
+                    return self.send_json(409, {"error": "Р­С‚РѕС‚ slug СѓР¶Рµ Р·Р°РЅСЏС‚, РІС‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№"})
                 conn.execute(
                     "UPDATE workspaces SET slug = ? WHERE user_id = ?",
                     (slug, claims["uid"])
                 )
             return self.send_json(200, {"ok": True, "slug": slug, "url": f"/book/{slug}"})
 
-        return self.send_json(404, {"error": "Маршрут не найден"})
+        return self.send_json(404, {"error": "РњР°СЂС€СЂСѓС‚ РЅРµ РЅР°Р№РґРµРЅ"})
 
 
 def sms_reminder_worker():
@@ -1250,7 +1250,7 @@ def sms_reminder_worker():
                         ).fetchone()
                         if already:
                             continue
-                        msg = f"Напоминаем о записи {r['date']} в {r['time']}. Ждём вас!"
+                        msg = f"РќР°РїРѕРјРёРЅР°РµРј Рѕ Р·Р°РїРёСЃРё {r['date']} РІ {r['time']}. Р–РґС‘Рј РІР°СЃ!"
                         params = urllib.parse.urlencode({"login": login, "psw": psw, "phones": r["phone"], "mes": msg, "fmt": 3, "charset": "utf-8"})
                         try:
                             urllib.request.urlopen(f"https://smsc.ru/sys/send.php?{params}", timeout=8).read()
@@ -1271,3 +1271,4 @@ if __name__ == "__main__":
     server = ThreadingHTTPServer(("0.0.0.0", port), BizPilotHandler)
     print(f"BizPilot API & App running on http://localhost:{port}")
     server.serve_forever()
+
